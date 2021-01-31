@@ -43,8 +43,7 @@ $primary: #409EFF; // 主色调
         top: 0;
         right: 0;
         bottom: 0;
-        background-color: #314659;
-
+        background-color: white;
     }
     & > .visual-editor-head {
         position: absolute;
@@ -52,7 +51,6 @@ $primary: #409EFF; // 主色调
         top: 0;
         left: $menuSize;
         right: $operatorSize;
-        background-color: #409eff;
 
     }
     & > .visual-editor-body {
@@ -61,12 +59,27 @@ $primary: #409EFF; // 主色调
         padding-right: $operatorSize;
         box-sizing: border-box; // 如果不加这个会使内容无视外面的下边距
         height: 100%;
-        background-color: skyblue;
+        background-color: rgba(white, 0.3);
+        position: relative;
+        z-index: 1;
 
         & > .visual-editor-content{
             height: 100%;
             width: 100%;
             overflow: auto;
+            display: flex;
+            justify-content: center;
+
+            & > .visual-editor-container{
+                background-color: white; 
+                flex-shrink: 0;
+                flex-grow: 0;
+                position: relative;
+
+               .visual-editor-block{
+                   position: absolute;
+               }
+            }
         }
 
     }
