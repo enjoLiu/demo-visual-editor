@@ -1,7 +1,7 @@
 <template>
   <div class="app">
     <h1>这个是页面内容</h1>
-    <visual-editor v-model="jsonData"/>
+    <visual-editor v-model="jsonData" :config="visualConfig"/>
     <!-- 注释掉上面，去测试testUseModel -->
     <!-- <test-use-model v-model="val"/>val:{{val}} -->
   </div>
@@ -11,6 +11,7 @@
   import { defineComponent } from 'vue'
   import { VisualEditor } from '@/packages/visual-editor'
   import { TestUseModel } from '@/packages/utils/useModel'
+  import { visualConfig } from '@/visual.config'
 
   export default defineComponent({
     name: 'App',
@@ -24,6 +25,7 @@
       //   val: '',
       // }
       return {
+        visualConfig,
         jsonData: {
           container: {
             height: 500,
