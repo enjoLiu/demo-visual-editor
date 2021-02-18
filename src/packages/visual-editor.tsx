@@ -77,6 +77,7 @@ export const VisualEditor = defineComponent({
                         top: e.offsetY,
                         left: e.offsetX,
                         componentKey: component!.key,
+                        adjustpositon: true, // 第一次拖拽到内容里是true
                     })
     
                     dataModel.value = {

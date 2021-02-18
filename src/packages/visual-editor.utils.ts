@@ -2,8 +2,9 @@
 // 数据模型，用于实现组价内双向数据绑定
 export interface VisualEditorBlockData {
     componentKey: string,
-    top: number,
+    top: number, // 组件的定位
     left: number,
+    adjustpositon: boolean, // 是否需要自动调整位置，用于第一次拖出，自动调整到鼠标正中
 }
 
 export interface VisualEditorModelValue {
