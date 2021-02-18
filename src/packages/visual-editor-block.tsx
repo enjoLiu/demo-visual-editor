@@ -1,4 +1,3 @@
-
 import {defineComponent, PropType, computed} from 'vue'
 import {VisualEditorBlockData} from "@/packages/visual-editor.utils"
 
