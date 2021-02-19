@@ -1,4 +1,3 @@
-
 $headSize: 60px; // 顶部操作栏的高度
 $menuSize: 275px; // 菜单列表的宽度
 $operatorSize: 275px; // 右侧编辑详情的宽度
@@ -28,7 +27,8 @@ $primary: #409EFF; // 主色调
         background-color: rgba(black, 0.1);
         content: '',
     }
-    & > .visual-editor-menu {
+
+    &>.visual-editor-menu {
         position: absolute;
         width: $menuSize;
         top: 0;
@@ -37,7 +37,7 @@ $primary: #409EFF; // 主色调
         background-color: white;
         z-index: 9;
 
-        .visual-editor-menu-item{
+        .visual-editor-menu-item {
             position: relative;
             width: calc(100% - 20px);
             margin-left: 10px;
@@ -60,13 +60,15 @@ $primary: #409EFF; // 主色调
                 content: '';
                 z-index: 2;
             }
+
             &:hover {
                 border-color: $primary;
                 cursor: move;
             }
 
         }
-        .visual-editor-menu-item-label{
+
+        .visual-editor-menu-item-label {
             position: absolute;
             top: -3px;
             left: -3px;
@@ -77,7 +79,8 @@ $primary: #409EFF; // 主色调
             z-index: 1;
         }
     }
-    & > .visual-editor-operator {
+
+    &>.visual-editor-operator {
         position: absolute;
         width: $operatorSize;
         top: 0;
@@ -86,7 +89,8 @@ $primary: #409EFF; // 主色调
         background-color: white;
         z-index: 9;
     }
-    & > .visual-editor-head {
+
+    &>.visual-editor-head {
         position: absolute;
         height: $headSize;
         top: 0;
@@ -94,7 +98,8 @@ $primary: #409EFF; // 主色调
         right: $operatorSize;
 
     }
-    & > .visual-editor-body {
+
+    &>.visual-editor-body {
         padding-top: $headSize;
         padding-left: $menuSize;
         padding-right: $operatorSize;
@@ -104,22 +109,39 @@ $primary: #409EFF; // 主色调
         position: relative;
         z-index: 1;
 
-        & > .visual-editor-content{
+        &>.visual-editor-content {
             height: 100%;
             width: 100%;
             overflow: auto;
             display: flex;
             justify-content: center;
 
-            & > .visual-editor-container{
-                background-color: white; 
+            &>.visual-editor-container {
+                background-color: white;
                 flex-shrink: 0; // 按比例空间缩减，0：谁爱减谁减我不缩减
                 flex-grow: 0; // 当前元素的扩展比率
                 position: relative;
 
-               .visual-editor-block{
-                   position: absolute;
-               }
+                .visual-editor-block {
+                    position: absolute;
+
+                    // 当在画布中选中这个组件进行拖拽的时候，其实是不希望他能被选中的，所以需要伪元素遮盖
+                    &:after {
+                        $space: 3px;
+                        position: absolute;
+                        top: -$space;
+                        left: -$space;
+                        right: -$space;
+                        bottom: -$space;
+                        content: '';
+                    }
+
+                    &.visual-editor-block-focus {
+                        &:after {
+                            border: dashed 1px $primary;
+                        }
+                    }
+                }
             }
         }
 

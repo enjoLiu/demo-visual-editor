@@ -1,6 +1,6 @@
 import { defineComponent, PropType, computed, ref } from 'vue'
 import './visual-editor.scss'
-import { VisualEditorModelValue, VisualEditorConfig, VisualEditorComponent } from '@/packages/visual-editor.utils'
+import { VisualEditorModelValue, VisualEditorConfig, VisualEditorComponent, createNewBlock, VisualEditorBlockData } from '@/packages/visual-editor.utils'
 import { useModel } from '@/packages/utils/useModel'
 import { VisualEditorBlock } from '@/packages/visual-editor-block'
 
@@ -27,7 +27,18 @@ export const VisualEditor = defineComponent({
             height: `${dataModel.value.container.height}px`,
         }))
 
-         
+        // 抽离公用方法，容器内组件选择的取消事件处理
+        const methods = {
+            clearFocus: (block?: VisualEditorBlockData) => {
+                let blocks = dataModel.value.blocks || []
+                if (blocks.length === 0) return
+                if (!!block) {
+                    blocks = blocks.filter(item => item !== block)
+                }
+                blocks.forEach(block => block.focus = false)
+            }
+        }
+
         /** 
          * 用于实现拖拽，使用原生方法
          * 使用下面这种方式，自执行函数的方式可以使暴露出来的方法仅仅是外面需要的。
@@ -73,13 +84,8 @@ export const VisualEditor = defineComponent({
                 drop: (e: DragEvent) => {
                     // 放置的时候触发，只有在拖拽进 body下的container下才会触发，即 ref绑定的组件，其他地方放置的时候是不触发的。
                     const blocks = dataModel.value.blocks || []
-                    blocks.push({
-                        top: e.offsetY,
-                        left: e.offsetX,
-                        componentKey: component!.key,
-                        adjustpositon: true, // 第一次拖拽到内容里是true
-                    })
-    
+                    blocks.push(createNewBlock({ component: component!, top: e.offsetY, left: e.offsetX, }))
+
                     dataModel.value = {
                         ...dataModel.value,
                         blocks,
@@ -87,6 +93,41 @@ export const VisualEditor = defineComponent({
                 }
             }
             return blockHander
+        })()
+        /* 
+         * 容器内，组件拖拽调整位置
+         * 不同于将组件拖拽进画布，使用drag, 画布内用 mouseMove
+         * 且需要支持多个同时拖拽
+         * 备注：
+         * 这里用 onMousedown 不用 click 的原因是因为需要鼠标点击后，直接拖拽，如果用click,就需要先点击一下，在拖拽，不连贯
+         * 支持可以多选
+         * 支持选择其他画布可以取消选中
+         * vue3会自动将监听事件代理到根节点上
+        */
+        const focusHandler = (() => {
+            return {
+                // 画布，容器，点击的冒泡处理
+                container: {
+                    onMousedown: (e: MouseEvent) => {
+                        e.stopPropagation() // 防止双击画布直接冒泡到组件上
+                        e.preventDefault()
+                        methods.clearFocus()
+                    }
+                },
+                // 容器内组件，点击它不需要冒泡到画布
+                block: {
+                    onMousedown: (e: MouseEvent, block: VisualEditorBlockData) => {
+                        e.stopPropagation()
+                        e.preventDefault()
+                        if (e.shiftKey) {
+                            block.focus = !block.focus
+                        } else {
+                            block.focus = true
+                            methods.clearFocus(block)
+                        }
+                    }
+                }
+            }
         })()
 
         return () => (
@@ -116,10 +157,18 @@ export const VisualEditor = defineComponent({
                             class="visual-editor-container"
                             style={containerStyles.value}
                             ref={containerRef} // 通过这里进行绑定
+                            {...focusHandler.container} // vue3通过这种方式绑定点击事件，而react需要通过派发的方式
                         >
                             {!!dataModel.value.blocks && (
                                 dataModel.value.blocks.map((block, index) => (
-                                    <VisualEditorBlock config={props.config} block={block} key={index} />
+                                    <VisualEditorBlock
+                                        config={props.config}
+                                        block={block}
+                                        key={index}
+                                        {...{
+                                            onMousedown: (e: MouseEvent) => focusHandler.block.onMousedown(e, block)
+                                        }}
+                                    />
                                 ))
                             )}
                         </div>

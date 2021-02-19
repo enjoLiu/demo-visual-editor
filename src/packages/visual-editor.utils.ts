@@ -5,6 +5,7 @@ export interface VisualEditorBlockData {
     top: number, // 组件的定位
     left: number,
     adjustpositon: boolean, // 是否需要自动调整位置，用于第一次拖出，自动调整到鼠标正中
+    focus: boolean, // 当前是否为选中状态
 }
 
 export interface VisualEditorModelValue {
@@ -21,6 +22,25 @@ export interface VisualEditorComponent {
     label: string,
     preview: () => JSX.Element,
     render: () => JSX.Element,
+}
+
+export function createNewBlock(
+    {
+        component,
+        left,
+        top,
+    }: {
+        component: VisualEditorComponent,
+        top: number,
+        left: number,
+    }): VisualEditorBlockData {
+    return {
+        top,
+        left,
+        componentKey: component!.key,
+        adjustpositon: true, // 第一次拖拽到内容里是true
+        focus: false,
+    }
 }
 
 /*
